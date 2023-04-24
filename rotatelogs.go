@@ -150,6 +150,19 @@ func (rl *RotateLogs) Write(p []byte) (n int, err error) {
 	return out.Write(p)
 }
 
+func (rl *RotateLogs)Sync()error{
+	rl.mutex.Lock()
+	defer rl.mutex.Unlock()
+
+	if rl.outFh == nil {
+		return nil
+	}
+
+	rl.outFh.Sync()
+	rl.outFh = nil
+	return nil
+}
+
 // must be locked during this operation
 func (rl *RotateLogs) getTargetWriter() (io.Writer, error) {
 	// This filename contains the name of the "NEW" filename
